@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/archall"
+          android:title="@string/m_s_archall"
+           />
+    <item android:id="@+id/expkey"
+          android:title="@string/m_s_expkey"
+           />
+    <item android:id="@+id/timeout"
+          android:title="@string/m_s_timeout_on"
+           />
+    <item android:id="@+id/help"
+          android:title="@string/m_s_help"
+           />
+</menu>
