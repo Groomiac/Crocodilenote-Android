@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/removeall"
+          android:title="@string/m_m_removeall"
+           />
+    <item android:id="@+id/linki"
+          android:title="@string/m_m_linki"
+           />
+    <item android:id="@+id/archoption"
+          android:title="@string/m_m_archoption"
+           />
+</menu>
