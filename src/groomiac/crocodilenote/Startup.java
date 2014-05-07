@@ -155,7 +155,7 @@ public class Startup extends Base {
 		lv.setLayoutParams(lp);
 
 
-		b.setText("     Add     ");
+		b.setText("   Add   ");
 		b_del.setText("Delete");
 		
 		b_del.setOnClickListener(new OnClickListener() {

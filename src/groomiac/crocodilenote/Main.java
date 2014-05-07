@@ -3,6 +3,7 @@ package groomiac.crocodilenote;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.crypto.Cipher;
@@ -183,8 +184,6 @@ public class Main extends Base {
 		if (xi > max)
 			max = xi;
 		
-		setTitle(title(max));
-		
 		thetexts = new Vector<InnerEdit>(max + 5);
 
 		ScrollView sv = new ScrollView(this);
@@ -202,8 +201,28 @@ public class Main extends Base {
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		sv.addView(l2);
 
+		
+		ArrayList<String> vals = null;
+		ArrayList<Integer> ids = null;
+		int newone = -1;
+		int focusone = -1;
+		
+		if(caller != null){
+			if(caller.getBooleanExtra("OKAY", false)){
+				vals = caller.getStringArrayListExtra("vals");
+				ids  = caller.getIntegerArrayListExtra("ids");
+				newone = caller.getIntExtra("newone", -1);
+				focusone = caller.getIntExtra("curfocus", -1);
+			}
+		}
+		
+		if(newone > 0) max = newone + 1;
+		
+		setTitle(title(max));
+		
 		for (int i = 0; i < max; i++) {
 			EditText t2 = new EditText(this);
+			t2.setId(i);
 			t2.setOnFocusChangeListener(new OnFocusChangeListener() {
 
 				@Override
@@ -218,22 +237,36 @@ public class Main extends Base {
 			thetexts.add(in);
 			t2.addTextChangedListener(new WatchImpl(in));
 			l2.addView(t2, 0);
-			if (checkFiles(i)) {
-				String x = loadFiles(i);
-				t2.setText(x);
-			} else {
-				t2.setText("");
+			if(ids != null && ids.contains(i)){
+				String tmp = vals.get(ids.indexOf(i));
+				if(tmp != null) t2.setText(tmp);
+				else t2.setText("err");
+				in.changed = true;
+			}
+			else{
+				if (checkFiles(i)) {
+					String x = loadFiles(i);
+					t2.setText(x);
+				} else {
+					t2.setText("");
 
+				}
 			}
 
-			if (i == max - 1)
-				t2.requestFocus();
+			if(focusone >= 0){
+				if (i == focusone)
+					t2.requestFocus();
+			}
+			else{
+				if (i == max - 1)
+					t2.requestFocus();
+			}
 		}
 
 		WatchImpl.enable = true;
 
 		Button b1 = new Button(this);
-		b1.setText("   Save   ");
+		b1.setText("  Save  ");
 
 		b1.setOnClickListener(new OnClickListener() {
 			@Override
@@ -253,7 +286,7 @@ public class Main extends Base {
 		});
 
 		Button b2 = new Button(this);
-		b2.setText("   Add   ");
+		b2.setText("  Add  ");
 
 		b2.setOnClickListener(new OnClickListener() {
 			@Override
@@ -271,6 +304,7 @@ public class Main extends Base {
 				t2.setOnEditorActionListener(one);
 
 				l2.addView(t2, 0);
+				t2.setId(max);
 				max++;
 				InnerEdit in = new InnerEdit(t2, true);
 				thetexts.add(in);
@@ -306,7 +340,7 @@ public class Main extends Base {
 		});
 
 		Button b4 = new Button(this);
-		b4.setText(" Return ");
+		b4.setText("Return");
 
 		b4.setOnClickListener(new OnClickListener() {
 			@Override
@@ -352,14 +386,36 @@ public class Main extends Base {
 		setContentView(l1);
 	}
 
+	
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		WatchImpl.enable = false;
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+		ArrayList<String> vals = new ArrayList<String>();
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		int newone = 0;
+		
+		for (int i = 0; i < max; i++) {
+			if(!checkFiles(i)){
+				newone = i;
+				ids.add(i);
+				vals.add(thetexts.get(i).edit.getText().toString());
+			}
+			else if(thetexts.get(i).changed) {
+				ids.add(i);
+				vals.add(thetexts.get(i).edit.getText().toString());
+			}
+		}
+		
+		if(newone > 0) outState.putInt("newone", newone);
+		outState.putStringArrayList("vals", vals);
+		outState.putIntegerArrayList("ids", ids);
+		if(curfocus != null) outState.putInt("curfocus", curfocus.getId());
+		outState.putBoolean("OKAY", true);
 	}
 
 	static class WatchImpl implements TextWatcher {
-		static boolean enable = false;
+		static boolean enable = true;
 
 		InnerEdit in;
 
