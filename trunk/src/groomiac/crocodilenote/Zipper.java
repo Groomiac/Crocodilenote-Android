@@ -43,6 +43,7 @@ public class Zipper {
 				
 				FileInputStream fi = new FileInputStream(f);
 				ZipEntry entry = new ZipEntry(saniZipPath(f.getAbsolutePath()));
+				entry.setTime(f.lastModified());
 				out.putNextEntry(entry);
 				int count;
 				while ((count = fi.read(data)) != -1) {

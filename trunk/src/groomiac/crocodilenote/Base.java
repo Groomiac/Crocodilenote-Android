@@ -37,6 +37,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -94,6 +95,8 @@ public class Base extends Activity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		cancelLogoutTimer();
 	}
 	
 	static boolean isInit(){
@@ -174,10 +177,18 @@ public class Base extends Activity {
 		active_del.remove(me);
 	}
 	
+	private Bundle saved;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		saved = savedInstanceState;
 
+		if(android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.GINGERBREAD_MR1) {
+		    getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+		}
+	    
 		me = this;
 		
 		if(IS_INIT != INITIALIZED){
@@ -313,15 +324,28 @@ public class Base extends Activity {
 				
 				kcipher = Cipher.getInstance(ecb);
 				kcipher.init(Cipher.DECRYPT_MODE, seckey);
-				
+
 				if(me instanceof Launcher){
 					startActivity(new Intent(me, Startup.class));
 				}
 				else{
-					if(getIntent() != null)
-						startActivity(getIntent());
-					else
-						startActivity(new Intent(me, getClass()));
+					Intent inty = null;
+					if(getIntent() != null){
+						inty = getIntent();
+					}
+					else{
+						inty = new Intent(me, getClass());
+					}
+					
+					if(saved != null && saved.getBoolean("OKAY", false)){
+						inty.putStringArrayListExtra("vals", saved.getStringArrayList("vals"));
+						inty.putIntegerArrayListExtra("ids", saved.getIntegerArrayList("ids"));
+						inty.putExtra("newone", saved.getInt("newone", -1));
+						inty.putExtra("curfocus", saved.getInt("curfocus", -1));
+						inty.putExtra("OKAY", true);
+					}
+					
+					startActivity(inty);
 				}
 				me.finish();
 				
