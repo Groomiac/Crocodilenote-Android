@@ -21,6 +21,7 @@ import android.graphics.Color;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Gravity;
@@ -375,6 +376,17 @@ public class Startup extends Base {
 			
 			return true;
 			
+		case R.id.win:
+			try {
+				String url = "https://github.com/Groomiac/CrocodileNote/releases";
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(Uri.parse(url));
+				startActivity(i);
+			} catch (Exception e) {
+			}
+			
+			return true;
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -435,7 +447,7 @@ public class Startup extends Base {
 			return new FolderItem(nickname, null);
 		}
 	}
-
+	
 	private static void storeInfo(String folder, String salt, String showname) {
 		try {
 			Cipher c = Cipher.getInstance(cbc);

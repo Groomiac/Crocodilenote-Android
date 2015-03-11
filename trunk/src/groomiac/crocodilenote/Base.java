@@ -72,9 +72,20 @@ public class Base extends Activity {
 	private static int IS_INIT = 0;
 	private static final int INITIALIZED = 42;
 
+	
+	final static String CACHE_KEY = "CACHEKEY";
+	final static String CACHE_KEYID = "CACHEKEYID";
+	
+	protected static final String CACHEKEY_FILE = "cache";
+	protected static final String CACHEKEYID_FILE = "cacheid";
+	protected static byte[] tmp_esk_cachekey;
+	protected static String tmp_esk_cacheid;
+
 	protected static byte[] tmp_esk;
 	protected static Cipher kcipher;
 	protected static Mac ivMac;
+	
+	private static File filesdir;
 	
 	static void deinit(){
 		IS_INIT = -99;
@@ -88,12 +99,24 @@ public class Base extends Activity {
 	}
 	
 	static void logout(){
-		new Random(System.nanoTime()).nextBytes(tmp_esk);
+		if(tmp_esk != null) new Random(System.nanoTime()).nextBytes(tmp_esk);
+		if(tmp_esk_cachekey != null) new Random(System.nanoTime()).nextBytes(tmp_esk_cachekey);
 		try {
 			if(kcipher != null)
 				kcipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(tmp_esk, aes));
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		
+		if(filesdir != null && filesdir.exists()){
+			try {
+				File f_cacheid = new File(filesdir, CACHEKEYID_FILE);
+				File f_cache = new File(filesdir, CACHEKEY_FILE);
+				f_cacheid.delete();
+				Utils.wipe(f_cache);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		cancelLogoutTimer();
@@ -150,6 +173,36 @@ public class Base extends Activity {
 		return active.size() != 0;
 	}
 	
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (this instanceof Startup && keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            return true;
+        }
+        else {
+            return super.onKeyDown(keyCode, event);
+        }
+    }
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+    	super.onSaveInstanceState(outState);
+    	
+    	outState.putString(CACHE_KEYID, tmp_esk_cacheid);
+    	outState.putByteArray(CACHE_KEY, tmp_esk_cachekey);
+    	
+    }
+    
+    @Override
+    public void onBackPressed() {
+        if (this instanceof Startup){
+            moveTaskToBack(true);
+        }
+        else{
+        	super.onBackPressed();
+        }
+    }
+	
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
@@ -184,6 +237,8 @@ public class Base extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		saved = savedInstanceState;
+		
+		filesdir = getFilesDir();
 
 		if(android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.GINGERBREAD_MR1) {
 		    getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
@@ -253,7 +308,53 @@ public class Base extends Activity {
 							e.printStackTrace();
 						}
 						
-						dialog_loadpw();
+						File f_cacheid = new File(getFilesDir(), CACHEKEYID_FILE);
+						File f_cache = new File(getFilesDir(), CACHEKEY_FILE);
+						byte[] tmpk = null;
+						
+						if(savedInstanceState != null){
+							try {
+								String s = savedInstanceState.getString(CACHE_KEYID);
+								if(s != null){
+									
+									if(f_cacheid.exists() && f_cache.exists()){
+										String s_compare = Utils.readFile(f_cacheid.getAbsolutePath());
+
+										if(s.equalsIgnoreCase(s_compare)){
+											byte[] cache = Utils.readBytes(f_cache.getAbsolutePath());
+											byte[] key = savedInstanceState.getByteArray(CACHE_KEY);
+
+											if(cache != null && key != null && cache.length == 32 && key.length == 32){
+												
+												try {
+													SecretKeySpec seckey = new SecretKeySpec(key, aes);
+													Cipher cipher = Cipher.getInstance(ecb);
+													cipher.init(Cipher.DECRYPT_MODE, seckey);
+													tmpk = cipher.doFinal(cache);
+													
+													tmp_esk_cacheid = s;
+													tmp_esk_cachekey = key;
+
+												} catch (Exception e) {
+													e.printStackTrace();
+												}
+												
+											}
+										}
+									}
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+
+						if(tmpk == null) {
+							f_cacheid.delete();
+							Utils.wipe(f_cache);
+						}
+						
+						dialog_loadpw(tmpk);
+						
 					}
 					else{
 						dialog_reintro();
@@ -278,7 +379,7 @@ public class Base extends Activity {
 	}
 	
 	//Crypto
-	private void loadpw(String pw){
+	private void loadpw(String pw, byte[] cachedkey){
 		try {
 			//Check key material
 			byte[] tmp_ce, tmp_cd, tmp_ke, s;
@@ -291,19 +392,26 @@ public class Base extends Activity {
 			ivMac = Mac.getInstance(hmac);
 			ivMac.init(new SecretKeySpec(s, aes));
 			
-			Mac mac = Mac.getInstance(hmac);
-			PBKDF2 ff = new PBKDF2(mac);
-			
-			byte[] pwkey = ff.generateDerivedParameters(256, pw.getBytes(), s, it);
-
-			SecretKeySpec seckey = new SecretKeySpec(pwkey, aes);
 			Cipher cipher = Cipher.getInstance(ecb);
-			cipher.init(Cipher.DECRYPT_MODE, seckey);
+			SecretKeySpec seckey;
+
+			if(cachedkey == null){
+				Mac mac = Mac.getInstance(hmac);
+				PBKDF2 ff = new PBKDF2(mac);
+				
+				byte[] pwkey = ff.generateDerivedParameters(256, pw.getBytes(), s, it);
+
+				seckey = new SecretKeySpec(pwkey, aes);
+				cipher.init(Cipher.DECRYPT_MODE, seckey);
+				tmp_ke = cipher.doFinal(tmp_ke);
+
+			}
+			else{
+				tmp_ke = cachedkey;
+			}
 			
-			tmp_ke = cipher.doFinal(tmp_ke);
 			seckey = new SecretKeySpec(tmp_ke, aes);
 			cipher.init(Cipher.DECRYPT_MODE, seckey);
-			
 			tmp_ce = cipher.doFinal(tmp_ce);
 
 			if(Arrays.equals(tmp_cd, tmp_ce)){
@@ -324,45 +432,76 @@ public class Base extends Activity {
 				
 				kcipher = Cipher.getInstance(ecb);
 				kcipher.init(Cipher.DECRYPT_MODE, seckey);
-
-				if(me instanceof Launcher){
-					startActivity(new Intent(me, Startup.class));
-				}
-				else{
-					Intent inty = null;
-					if(getIntent() != null){
-						inty = getIntent();
-					}
-					else{
-						inty = new Intent(me, getClass());
-					}
-					
-					if(saved != null && saved.getBoolean("OKAY", false)){
-						inty.putStringArrayListExtra("vals", saved.getStringArrayList("vals"));
-						inty.putIntegerArrayListExtra("ids", saved.getIntegerArrayList("ids"));
-						inty.putExtra("newone", saved.getInt("newone", -1));
-						inty.putExtra("curfocus", saved.getInt("curfocus", -1));
-						inty.putExtra("OKAY", true);
-					}
-					
-					startActivity(inty);
-				}
-				me.finish();
 				
-				ENC = true;
-				skiplauncher = true;
+				Random rrr = new Random(System.nanoTime());
+				
+				if(cachedkey == null){
+					key_gen.generateKey();
+					tmp_esk_cachekey = key_gen.generateKey().getEncoded();
+					seckey = new SecretKeySpec(tmp_esk_cachekey, aes);
+					cipher.init(Cipher.ENCRYPT_MODE, seckey);
+					byte[] tmp_esk_cache = cipher.doFinal(tmp_ke);
+					
+					Utils.writeFile(tmp_esk_cache, new FileOutputStream(new File(getFilesDir(), CACHEKEY_FILE)));
+					tmp_esk_cacheid = new Random().nextLong() + ":" + hashCode();
+					Utils.writeFile(tmp_esk_cacheid, new FileOutputStream(new File(getFilesDir(), CACHEKEYID_FILE)));
+					
+					rrr.nextBytes(tmp_esk_cache);
+				}
+				
+				rrr.nextBytes(tmp_ke);
+
+				uistartup();
 			}
 			else{
 				Toast.makeText(me, "Password is not correct!", Toast.LENGTH_LONG).show();
 				
 				deinit();
+				try {
+					logout();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				finish();
 			}
 		} catch (Exception e) {
 			Toast.makeText(me, "AES encryption not possible on your device!", Toast.LENGTH_LONG).show();
 			e.printStackTrace();
+			finish();
 		}
 	}
+	
+	
+	private void uistartup(){
+		if(me instanceof Launcher){
+			startActivity(new Intent(me, Startup.class));
+		}
+		else{
+			Intent inty = null;
+			if(getIntent() != null){
+				inty = getIntent();
+			}
+			else{
+				inty = new Intent(me, getClass());
+			}
+			
+			if(saved != null && saved.getBoolean("OKAY", false)){
+				inty.putStringArrayListExtra("vals", saved.getStringArrayList("vals"));
+				inty.putIntegerArrayListExtra("ids", saved.getIntegerArrayList("ids"));
+				inty.putExtra("newone", saved.getInt("newone", -1));
+				inty.putExtra("curfocus", saved.getInt("curfocus", -1));
+				inty.putExtra("OKAY", true);
+			}
+			
+			startActivity(inty);
+		}
+		me.finish();
+		
+		ENC = true;
+		skiplauncher = true;
+
+	}
+	
 
 	//Properties
 	static Properties props = new Properties();
@@ -908,26 +1047,32 @@ public class Base extends Activity {
 	}
 
 	//Dialogs
-	void dialog_loadpw(){
-		makeStringDialog("Enter your Password", "password", new StringResult() {
-			
-			@Override
-			void receive(String ret) {
-				loadpw(ret);
-			}
-		},
+	void dialog_loadpw(byte[] cachedkey){
 		
-		new Base.StringResult() {
-			
-			@Override
-			void receive(String ret) {
-				deinit();
-				finish();
-				
-			}
+		if(cachedkey != null){
+			loadpw(null, cachedkey);
 		}
+		else{
+			makeStringDialog("Enter your Password", "password", new StringResult() {
 				
-		);
+				@Override
+				void receive(String ret) {
+					loadpw(ret, null);
+				}
+			},
+			
+			new Base.StringResult() {
+				
+				@Override
+				void receive(String ret) {
+					deinit();
+					finish();
+					
+				}
+			}
+					
+			);
+		}
 	}
 	
 	void dialog_createpw(){
@@ -984,7 +1129,7 @@ public class Base extends Activity {
 					
 					props.setProperty(_P.timeout.name(), "true");
 					savePropTrue(_P.secrecy);
-					loadpw(ret);
+					loadpw(ret, null);
 					
 				} catch (Exception e) {
 					Toast.makeText(me, "AES encryption not possible on your device!", Toast.LENGTH_LONG).show();

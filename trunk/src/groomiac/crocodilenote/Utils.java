@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.util.Random;
 
 
 public class Utils {
@@ -48,6 +50,46 @@ public class Utils {
 
 		return new String(baos.toString().trim()).replace("\r", "");
 	}
+	
+	//TODO: against forensics...do not use baos, but manual array copies!
+	public static byte[] readBytes(String file){
+		FileInputStream fis = null;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+
+		try {
+			fis = new FileInputStream(new File(file));
+			
+			byte[] thearray = new byte[1024];
+			int b = 0;
+			
+			while (true){
+				try {
+					b = fis.read(thearray);
+					if (b>=0){
+						baos.write(thearray, 0, b);
+					}
+					else{
+						break;
+					}
+				} catch (Exception e) {
+					break;
+				}			
+			}
+
+		} catch (IOException e) {
+			return null;
+		} finally{
+			try {
+				if(fis!=null) fis.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return baos.toByteArray();
+	}
+	
+
 	
 	public static void writeFile(String string, String file){
 		try {
@@ -104,6 +146,16 @@ public class Utils {
 		}		
 	}
 
+	public static void writeFile(byte[] bytes, OutputStream fos){
+		try {
+			fos.write(bytes);
+			fos.flush();
+			fos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+	}
+
 	public static boolean copyFile(String src, String dest) {
 		return copyFile(new File(src), new File(dest));
 	}
@@ -141,6 +193,22 @@ public class Utils {
 		
 		if(dest.exists() && dest.isFile()) return true;
 		return false;
+	}
+	
+	
+	public static final void wipe(File f){
+		try {
+			byte[] buf = new byte[(int)f.length()];
+			new Random().nextBytes(buf);
+			
+			RandomAccessFile raf = new RandomAccessFile(f, "rw");
+			raf.write(buf);
+			raf.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		f.delete();
 	}
 	
 }

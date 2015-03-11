@@ -5,6 +5,7 @@
     <string name="m_s_expkey">Backup Secrets file</string>
     <string name="m_s_timeout_on">Auto-Logout 30min (on)</string>
     <string name="m_s_timeout_off">Auto-Logout 30min (off)</string>
+    <string name="m_s_win">Windows client</string>
     
     <string name="m_m_removeall">Remove All</string>
     <string name="m_m_linki">Show Links</string>
