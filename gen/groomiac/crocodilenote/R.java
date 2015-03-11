@@ -22,20 +22,22 @@ public final class R {
         public static final int linki=0x7f060001;
         public static final int removeall=0x7f060000;
         public static final int timeout=0x7f060005;
+        public static final int win=0x7f060007;
     }
     public static final class layout {
         public static final int menu_main=0x7f030000;
         public static final int menu_startup=0x7f030001;
     }
     public static final class string {
-        public static final int m_m_archoption=0x7f040007;
-        public static final int m_m_linki=0x7f040006;
-        public static final int m_m_removeall=0x7f040005;
+        public static final int m_m_archoption=0x7f040008;
+        public static final int m_m_linki=0x7f040007;
+        public static final int m_m_removeall=0x7f040006;
         public static final int m_s_archall=0x7f040000;
         public static final int m_s_expkey=0x7f040002;
         public static final int m_s_help=0x7f040001;
         public static final int m_s_timeout_off=0x7f040004;
         public static final int m_s_timeout_on=0x7f040003;
+        public static final int m_s_win=0x7f040005;
     }
     public static final class style {
         /** 
