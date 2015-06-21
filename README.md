@@ -7,9 +7,8 @@ CrocodileNote supports two modes - plain and encryption. In encryption mode all 
 In plain mode you can view and copy folders directly via PC from your internal SD card. Use encryption if you want to protect your data and your privacy!
 
 Further features:
-
-    Export to ZIP for backup
-    Linkify notes in case you store e-mail addresses, Internet addresses/URLs or phone numbers
-    Auto-logout switch for 30 minutes (encryption mode only) 
+- Export to ZIP for backup
+- Linkify notes in case you store e-mail addresses, Internet addresses/URLs or phone numbers
+- Auto-logout switch for 30 minutes (encryption mode only) 
 
 https://play.google.com/store/apps/details?id=groomiac.crocodilenote 
