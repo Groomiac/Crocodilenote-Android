@@ -82,7 +82,7 @@ public class Main extends Base {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.removeall:
-			makeYesnoDialog("Delete all texts here?", new StringResult() {
+			makeYesnoDialog("Delete all notes here?", new StringResult() {
 				
 				@Override
 				void receive(String ret) {
@@ -315,7 +315,7 @@ public class Main extends Base {
 		});
 
 		Button b3 = new Button(this);
-		b3.setText("Save & Exit");
+		b3.setText("Save & exit");
 		b3.setOnClickListener(new OnClickListener() {
 			//TODO: reduce redundancy
 			
@@ -333,7 +333,7 @@ public class Main extends Base {
 					Toast.makeText(me, "Saved (" + ctr + ")",
 							Toast.LENGTH_SHORT).show();
 				else
-					Toast.makeText(me, "Quick Exit", Toast.LENGTH_SHORT).show();
+					Toast.makeText(me, "Exited CrocodileNote", Toast.LENGTH_SHORT).show();
 
 				finish();
 			}
@@ -347,7 +347,7 @@ public class Main extends Base {
 			public void onClick(View v) {
 				for (int i = 0; i < max; i++) {
 					if (thetexts.get(i).changed || !checkFiles(i)) {
-						Toast.makeText(me, "unsaved data", Toast.LENGTH_SHORT)
+						Toast.makeText(me, "There are unsaved notes", Toast.LENGTH_SHORT)
 								.show();
 						return;
 					}

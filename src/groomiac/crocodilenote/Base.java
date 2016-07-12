@@ -60,7 +60,7 @@ public class Base extends Activity {
 	final static String file_secret = "secret.conf";
 	
 	final static String t_cancel = "Cancel";
-	final static String t_ok = "Ok";
+	final static String t_ok = "OK";
 	final static String t_okay = "Okay";
 	final static String t_yes = "Yes";
 	final static String t_no = "No";
@@ -454,7 +454,7 @@ public class Base extends Activity {
 				uistartup();
 			}
 			else{
-				Toast.makeText(me, "Password is not correct!", Toast.LENGTH_LONG).show();
+				Toast.makeText(me, "Incorrect password!", Toast.LENGTH_LONG).show();
 				
 				deinit();
 				try {
@@ -754,7 +754,7 @@ public class Base extends Activity {
 		}
 
 		Button bok = new Button(me);
-		bok.setText("   Ok   ");
+		bok.setText("   OK   ");
 		bok.setTextColor(Color.BLACK);
 
 		Button can = new Button(me);
@@ -1053,7 +1053,7 @@ public class Base extends Activity {
 			loadpw(null, cachedkey);
 		}
 		else{
-			makeStringDialog("Enter your Password", "password", new StringResult() {
+			makeStringDialog("Enter your password", "password", new StringResult() {
 				
 				@Override
 				void receive(String ret) {
@@ -1076,7 +1076,7 @@ public class Base extends Activity {
 	}
 	
 	void dialog_createpw(){
-		makeStringDialog("Create your Password", "password", new StringResult() {
+		makeStringDialog("Set your password", "password", new StringResult() {
 			
 			@Override
 			void receive(String ret) {
@@ -1155,15 +1155,15 @@ public class Base extends Activity {
 	}
 
 	void dialog_intro(final boolean showonly){
-		makeHelloDialog(showonly, "Hello to CrocodileNote",
-				"CrocodileNote supports two modes of operation - plaintext or encryption. You have to choose a mode to initilize CrocodileNote.\n" +
+		makeHelloDialog(showonly, "Welcome to CrocodileNote",
+				"CrocodileNote supports two modes of operation - plaintext and encrypted note-taking. You have to choose a mode to initialize CrocodileNote.\n" +
 				"Notes are stored on the SD card in the 'CrocodileNote' folder for easy backup.\n\n" +
-				"In encryption mode you have to provide a password which is used for password based encryption. We are using an encryption scheme for encryption-key derivation from the common standard PKCS#5 which is used for instance " +
-				"in the famos TrueCrypt disk encryption software and others.\n" +
-				"The encryption key is cached in working memory temporarily until Android finishes the app or you logout explicitly.\n" +
-				"\nATTENTION: You should write down your password on a paper and keep the paper at a safe place for backup purposes. It is NOT possible to recover any of your data in case you forget " +
-				"or loose your password. There is no backdoor or recovery possible to break the encryption (AES-256)!\n" +
-				"A secure password contains mixed letters, numbers and special characters of at least 8(!) digits. We suggest you think of a unique sentence.\n",
+				"In the encryption mode you have to provide a password which is used for password-based encryption. CrocodileNote is using an encryption scheme for encryption-key derivation from the common standard PKCS#5 which is used, for instance, " +
+				"in the famous TrueCrypt disk encryption software, among others.\n" +
+				"The encryption key is temporarily cached in working memory until Android finishes the app or you log out explicitly.\n" +
+				"\nATTENTION: You should write down your password on a piece of paper and keep it in a safe place for backup purposes. It is NOT possible to recover any of your data in case you forget " +
+				"or lose your password. There is no backdoor or recovery possible to break the encryption (AES-256)!\n" +
+				"A secure password consists of AT LEAST 8 random letters, digits and special symbols. Alternatively, if you are using Diceware or a similar technique, make a sentence at least 5 words long.\n",
 				new StringResult() {
 					
 					@Override
@@ -1175,8 +1175,8 @@ public class Base extends Activity {
 	
 	void dialog_reintro(){
 		makeHelloDialog(false, "Resetting CrocodileNote",
-				"Welcome back to CrocodileNote. CrocodileNote has detected an existing and encrypted notes folder. However, the app seems to be missing your key file.\n" +
-				"\nIf you want to reset CrocodileNote completely and delete all(!) existing notes, please remove the folder:\n" + getFolder() + "\n" +
+				"Welcome back. CrocodileNote has detected an existing folder with encrypted notes. However, your key file seems to be missing.\n" +
+				"\nIf you want to reset CrocodileNote completely and delete ALL existing notes, please remove the folder:\n" + getFolder() + "\n" +
 				"\nOtherwise, please provide a key file to import.\n",
 				new StringResult() {
 					

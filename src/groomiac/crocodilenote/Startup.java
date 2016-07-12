@@ -105,7 +105,7 @@ public class Startup extends Base {
 		Button b_del = new Button(this);
 
 		Button b_logout = new Button(this);
-		b_logout.setText("  Logout  ");
+		b_logout.setText("  Log out  ");
 		
 		if(!ENC){
 			b_logout.setVisibility(View.GONE);
@@ -346,15 +346,15 @@ public class Startup extends Base {
 			return true;
 			
 		case R.id.expkey:
-			makeYesnoDialog("Backup key file to SD card?", new StringResult() {
+			makeYesnoDialog("Back up key file to SD card?", new StringResult() {
 				
 				@Override
 				void receive(String ret) {
 					File tmp_ext = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), file_secret);
 					
 					if(Utils.copyFile(secretpropFile, tmp_ext)){
-						makeHelloDialog(true, "Key backup", "Your personal secrets file is secured by your password. Nevertheless, you should remove the backup copy after you have copied it to a safe place.\n" +
-								"\nThe secrets file copy is:\n" + tmp_ext.getAbsolutePath() + "\n", null);
+						makeHelloDialog(true, "Key file backup", "Your personal key file is secured by your password. Nevertheless, you should move this backup copy to a safe place instead of leaving it on your SD card.\n" +
+								"\nThe key file copy is:\n" + tmp_ext.getAbsolutePath() + "\n", null);
 					}
 					else{
 						Toast.makeText(me, "Unknown error copying key file", Toast.LENGTH_SHORT).show();
