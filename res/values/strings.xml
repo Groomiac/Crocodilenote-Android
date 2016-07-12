@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="m_s_archall">Export All</string>
+    <string name="m_s_archall">Export all</string>
     <string name="m_s_help">Show introduction</string>
-    <string name="m_s_expkey">Backup Secrets file</string>
-    <string name="m_s_timeout_on">Auto-Logout 30min (on)</string>
-    <string name="m_s_timeout_off">Auto-Logout 30min (off)</string>
-    <string name="m_s_win">Windows client</string>
+    <string name="m_s_expkey">Backup secrets file</string>
+    <string name="m_s_timeout_on">30 min auto-logout (ON)</string>
+    <string name="m_s_timeout_off">30 min auto-logout (OFF)</string>
+    <string name="m_s_win">Get the Windows client!</string>
     
-    <string name="m_m_removeall">Remove All</string>
-    <string name="m_m_linki">Show Links</string>
+    <string name="m_m_removeall">Remove all</string>
+    <string name="m_m_linki">Linkify</string>
     <string name="m_m_archoption">Export</string>
 </resources>
