@@ -1,14 +1,21 @@
-_CrocodileNote for Android_
+# CrocodileNote for Android
 
-Take simple text notes. You can put them into folders to create your own quick, easy and robust file structure.
+A simple note-taking app. Create text notes and organize them into folders quickly and easily. All notes inside a folder are conveniently shown together, like slips of paper.
 
-CrocodileNote supports two modes - plain and encryption. In encryption mode all data is encrypted using password-based encryption (PKCS#5) with AES-256. These are common industry standards and used by, e.g., the famous TrueCrypt disk encryption.
+### Encryption
 
-In plain mode you can view and copy folders directly via PC from your internal SD card. Use encryption if you want to protect your data and your privacy!
+CrocodileNote can be used in one of two modes - plain or encryption. In the latter, all data is encrypted using password-based encryption (PKCS#5) with AES-256. These are common industry standards and are used by, for instance, the famous TrueCrypt disk encryption software.
 
-Further features:
-- Export to ZIP for backup
-- Linkify notes in case you store e-mail addresses, Internet addresses/URLs or phone numbers
-- Auto-logout switch for 30 minutes (encryption mode only) 
+In the plain mode you can view and copy folders to PC directly from your internal SD card. Use encryption if you want to protect your data and your privacy!
 
-https://play.google.com/store/apps/details?id=groomiac.crocodilenote 
+### Other features
+
+- **Backup:** export all notes to ZIP
+- **Linkify:** display notes with clickable links - useful if you store e-mail addresses, URLs or phone numbers
+- **Auto-logout:** option to automatically log out after 30 minutes of inactivity (encryption mode only) 
+
+### Links
+
+- [CrocodileNote on Google Play](https://play.google.com/store/apps/details?id=groomiac.crocodilenote)
+- [CrocodileNote on F-Droid](https://f-droid.org/repository/browse/?fdid=groomiac.crocodilenote)
+- [Developers' website](https://groomiac.appspot.com/)
